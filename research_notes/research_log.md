@@ -67,3 +67,35 @@ The transformation is artificial and should not be described as a real hospital-
 ### Next step
 
 The next experiment will apply temperature scaling using the validation set only. The test set will remain untouched for final evaluation.
+
+
+## Stage 1 Temperature Scaling Result
+
+Temperature scaling was fitted using the validation set only. The learned temperature was **0.9243**.
+
+### Test-set calibration comparison
+
+| Dataset | ECE before | ECE after | Change |
+|---|---:|---:|---:|
+| Original test | 0.1114 | 0.1288 | +0.0174 |
+| Reduced-contrast test | 0.2534 | 0.2660 | +0.0126 |
+
+### Initial observation
+
+For this baseline experiment, temperature scaling did not improve Expected Calibration Error on the untouched test set. ECE increased from 0.1114 to 0.1288. It also did not improve ECE on the reduced-contrast test set, where ECE increased from 0.2534 to 0.2660.
+
+The learned temperature was below 1, meaning the fitted calibration procedure increased the magnitude of the model's logits rather than reducing them.
+
+### Interpretation
+
+This result should not be treated as evidence that temperature scaling is generally ineffective. It shows that, for this particular small model, dataset split and experimental setup, fitting one temperature on the validation set did not improve the ECE measured on these test sets.
+
+The result is useful because it demonstrates why calibration methods need to be evaluated on held-out data rather than assumed to improve confidence automatically.
+
+### Limitation
+
+This is a small benchmark experiment. ECE is sensitive to binning and sample size, and the validation and test distributions are from the same benchmark rather than independent hospitals. Further analysis should include validation-set calibration behaviour, Brier score and negative log-likelihood, and should compare reliability diagrams before and after scaling.
+
+### Next step
+
+Before moving to a more complex calibration method, inspect the validation-set effect and compare Brier score and negative log-likelihood before and after temperature scaling. Then decide whether the baseline experiment needs refinement.
