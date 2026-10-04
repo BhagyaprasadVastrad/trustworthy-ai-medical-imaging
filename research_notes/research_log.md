@@ -157,3 +157,36 @@ The temperature optimisation did achieve a small improvement in the validation-s
 The held-out test results then showed increases in Brier score, log loss and ECE after scaling. Therefore, the learned temperature provided only a very small validation log-loss improvement and did not generalise as an improvement across the other probability-quality measures on the test data.
 
 This is not evidence that temperature scaling is generally ineffective. It is a result from this particular small baseline experiment and demonstrates the importance of evaluating calibration methods with held-out data and more than one metric.
+
+
+## Stage 1 Error Analysis
+
+The baseline test-set confusion matrix was:
+
+| | Predicted Normal | Predicted Pneumonia |
+|---|---:|---:|
+| Actual Normal | 32 | 202 |
+| Actual Pneumonia | 14 | 376 |
+
+This corresponds to:
+
+- True negatives: 32
+- False positives: 202
+- False negatives: 14
+- True positives: 376
+- False-positive rate: 0.8632
+- False-negative rate: 0.0359
+
+### Interpretation
+
+The high recall of 0.9641 is explained by the model identifying 376 of the 390 pneumonia cases, with only 14 false negatives.
+
+However, the model also incorrectly classified 202 of the 234 normal images as pneumonia. This produces a high false-positive rate of 0.8632 and explains why precision and overall accuracy are substantially lower than recall.
+
+Under the reduced-contrast transformation, false positives increased from 202 to 229, while false negatives decreased from 14 to 10. This is consistent with the earlier observation that the contrast shift made the model more likely to predict pneumonia.
+
+The precision-recall curve shows the expected trade-off between recall and precision as the classification threshold changes. The curve reaches high precision at lower recall values and declines as recall approaches 1.0.
+
+### Important caution
+
+The model should not be interpreted as clinically useful. The high false-positive rate on this benchmark and the small, simplified CNN are important limitations. The experiment is being used to study model behaviour, calibration and sensitivity to controlled input changes.
