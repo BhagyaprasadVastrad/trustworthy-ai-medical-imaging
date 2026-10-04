@@ -136,3 +136,24 @@ The baseline experiment has now shown two useful behaviours:
 3. Temperature scaling fitted on the validation set did not transfer into improved held-out calibration for this experiment.
 
 The next analysis will inspect validation-set changes before deciding whether to refine temperature scaling or move to another calibration method.
+
+
+## Validation Check for Temperature Scaling
+
+The learned temperature (0.9243) was fitted by minimising binary cross-entropy / negative log-likelihood on the validation set.
+
+Validation results before versus after scaling:
+
+| Metric | Before | After | Change |
+|---|---:|---:|---:|
+| Brier score | 0.1489 | 0.1493 | +0.0004 |
+| Log loss | 0.4497 | 0.4481 | -0.0016 |
+| ECE | 0.0690 | 0.0715 | +0.0025 |
+
+### Interpretation
+
+The temperature optimisation did achieve a small improvement in the validation-set log loss, which is the objective used by the temperature-fitting procedure. It did not improve Brier score or ECE on the validation set.
+
+The held-out test results then showed increases in Brier score, log loss and ECE after scaling. Therefore, the learned temperature provided only a very small validation log-loss improvement and did not generalise as an improvement across the other probability-quality measures on the test data.
+
+This is not evidence that temperature scaling is generally ineffective. It is a result from this particular small baseline experiment and demonstrates the importance of evaluating calibration methods with held-out data and more than one metric.
