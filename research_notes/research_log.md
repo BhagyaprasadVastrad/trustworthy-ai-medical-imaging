@@ -99,3 +99,40 @@ This is a small benchmark experiment. ECE is sensitive to binning and sample siz
 ### Next step
 
 Before moving to a more complex calibration method, inspect the validation-set effect and compare Brier score and negative log-likelihood before and after temperature scaling. Then decide whether the baseline experiment needs refinement.
+
+
+## Stage 1 Temperature Scaling Evaluation
+
+Temperature scaling was fitted on the validation set only, producing a learned temperature of **0.9243**.
+
+On the held-out test sets, temperature scaling did not improve the probability-quality metrics:
+
+| Dataset | Brier before | Brier after | Log loss before | Log loss after |
+|---|---:|---:|---:|---:|
+| Original test | 0.2071 | 0.2102 | 0.5948 | 0.6035 |
+| Reduced-contrast test | 0.2828 | 0.2901 | 0.8427 | 0.8845 |
+
+ECE also increased:
+
+| Dataset | ECE before | ECE after |
+|---|---:|---:|
+| Original test | 0.1114 | 0.1288 |
+| Reduced-contrast test | 0.2534 | 0.2660 |
+
+The reliability diagram likewise does not show a clear improvement after scaling.
+
+### Interpretation
+
+For this experiment, temperature scaling did not improve the held-out test-set calibration or probability-quality measures. This is a result to investigate rather than evidence that temperature scaling is ineffective in general.
+
+Before drawing a stronger conclusion, the validation-set objective should be checked directly to confirm that the learned temperature improved the metric on the data used for fitting. This will also help distinguish a calibration-method limitation from a validation-to-test mismatch.
+
+### Current Stage 1 conclusion
+
+The baseline experiment has now shown two useful behaviours:
+
+1. The model has measurable discriminative ability but imperfect calibration.
+2. A controlled reduction in image contrast worsened discrimination and confidence quality.
+3. Temperature scaling fitted on the validation set did not transfer into improved held-out calibration for this experiment.
+
+The next analysis will inspect validation-set changes before deciding whether to refine temperature scaling or move to another calibration method.
