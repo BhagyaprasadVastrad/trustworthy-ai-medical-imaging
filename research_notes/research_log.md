@@ -190,3 +190,59 @@ The precision-recall curve shows the expected trade-off between recall and preci
 ### Important caution
 
 The model should not be interpreted as clinically useful. The high false-positive rate on this benchmark and the small, simplified CNN are important limitations. The experiment is being used to study model behaviour, calibration and sensitivity to controlled input changes.
+
+
+## Stage 2 External-Dataset Evaluation Result
+
+The Stage 1 model was evaluated without retraining or fine-tuning on the RSNA Pneumonia Detection Challenge dataset.
+
+### Dataset and matching
+
+The extracted dataset contained 25,684 DICOM images representing 25,684 unique studies. Study-level labels were constructed from the RSNA annotation JSON:
+
+- No Lung Opacity: 20,025 studies
+- Lung Opacity: 5,659 studies
+
+All 25,684 DICOM images were successfully matched to a study-level label. No images were missing labels.
+
+### External evaluation
+
+The trained Stage 1 model generated predictions for all 25,684 studies.
+
+| Metric | PneumoniaMNIST Test | RSNA External | Change |
+|---|---:|---:|---:|
+| Accuracy | 0.6538 | 0.3639 | -0.2899 |
+| Precision | 0.6505 | 0.2373 | -0.4132 |
+| Recall | 0.9641 | 0.8521 | -0.1120 |
+| F1 score | 0.7769 | 0.3712 | -0.4057 |
+| AUROC | 0.7861 | 0.5640 | -0.2221 |
+| Brier score | 0.2071 | 0.3579 | +0.1508 |
+| ECE | 0.1114 | 0.4164 | +0.3050 |
+
+### Calibration observation
+
+The RSNA reliability diagram showed systematic overconfidence across all populated confidence bins.
+
+For example, the highest populated confidence bin had a mean predicted probability of approximately 0.92 but an observed positive frequency of approximately 0.29.
+
+The ECE increased from 0.1114 on PneumoniaMNIST to 0.4164 on RSNA, while the Brier score increased from 0.2071 to 0.3579.
+
+### Interpretation
+
+The model showed substantial external degradation in both discrimination and probability calibration. Recall remained relatively high, while precision fell sharply, indicating many false-positive predictions.
+
+This should be described as observed external performance degradation and miscalibration. The current experiment does not establish a single causal explanation. Dataset characteristics, image characteristics, prevalence, labeling procedures and preprocessing differences may all contribute.
+
+### Stage 2 conclusion
+
+The experiment supports the observation that a model's predictive and calibration behaviour on its original benchmark does not necessarily transfer reliably to an external dataset.
+
+This strengthens the motivation for studying calibration, uncertainty and robustness under dataset shift.
+
+### Important terminology
+
+The RSNA experiment is an **external-dataset evaluation**. It should not be described as the planned cross-hospital MIMIC-CXR to CheXpert experiment.
+
+### Next step
+
+Before moving to the planned cross-hospital experiment, investigate calibration and uncertainty methods that could better characterise or improve confidence reliability under distribution shift.
