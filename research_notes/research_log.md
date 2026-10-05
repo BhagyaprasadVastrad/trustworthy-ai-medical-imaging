@@ -246,3 +246,36 @@ The RSNA experiment is an **external-dataset evaluation**. It should not be desc
 ### Next step
 
 Before moving to the planned cross-hospital experiment, investigate calibration and uncertainty methods that could better characterise or improve confidence reliability under distribution shift.
+
+
+## Stage 3 Post-hoc Temperature Scaling Result
+
+The Stage 2 RSNA predictions were split into two stratified subsets of 12,842 studies each. Temperature scaling was fitted only on the calibration subset and evaluated on the separate held-out subset.
+
+The learned temperature was **1.5122**.
+
+### Held-out evaluation
+
+| Metric | Before calibration | After calibration | Change |
+|---|---:|---:|---:|
+| Brier score | 0.3590 | 0.3210 | -0.0380 |
+| Log loss | 0.9685 | 0.8521 | -0.1164 |
+| ECE | 0.4175 | 0.3794 | -0.0380 |
+| AUROC | 0.5641 | 0.5641 | 0.0000 |
+
+### Interpretation
+
+Temperature scaling partially improved probability calibration on held-out RSNA data. Brier score, log loss and ECE all decreased, while AUROC remained unchanged.
+
+The learned temperature greater than 1 indicates that the original external predictions benefited from probability compression. The reliability diagram showed the post-calibration curve moving closer to the perfect-calibration diagonal across most populated confidence bins.
+
+Calibration remained substantially imperfect after scaling, with ECE still at 0.3794. The highest-confidence post-calibration bin contained only two observations and should not be interpreted independently.
+
+### Important methodological note
+
+This is an external-data calibration experiment, not the planned cross-hospital MIMIC-CXR to CheXpert experiment. The calibration parameter was learned on one portion of RSNA and evaluated on a held-out portion of the same external dataset.
+
+### Stage 3 conclusion
+
+Post-hoc temperature scaling partially reduced calibration error on held-out external data but did not improve the underlying discrimination. The result motivates comparison with additional uncertainty and calibration methods under distribution shift.
+
