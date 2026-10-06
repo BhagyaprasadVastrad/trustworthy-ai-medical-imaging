@@ -7,4 +7,5 @@ tqdm
 torch
 torchvision
 medmnist
+pydicom
 jupyter
