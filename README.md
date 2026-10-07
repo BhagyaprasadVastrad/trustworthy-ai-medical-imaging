@@ -99,7 +99,7 @@ The notebook uses:
 
 ### Example PneumoniaMNIST images
 
-The Stage 1 notebook contains the actual PneumoniaMNIST image grid generated during the experiment. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view it.
+The Stage 1 notebook contains the executed PneumoniaMNIST image examples. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect the original output.
 
 ## Baseline test results
 
@@ -117,7 +117,7 @@ The model has relatively high recall, while the calibration analysis shows that 
 
 ### Reliability diagram
 
-The Stage 1 notebook also contains the executed reliability diagram. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view the original plot.
+The Stage 1 notebook contains the executed reliability diagram. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect the original plot.
 
 ## Controlled reduced-contrast experiment
 
@@ -125,7 +125,7 @@ The trained model was kept unchanged while the test images were modified using a
 
 This is intentionally a controlled stress test. It is **not** intended to reproduce a real hospital-to-hospital distribution shift.
 
-The Stage 1 notebook contains the executed side-by-side original/reduced-contrast image comparison. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view the original figure.
+The Stage 1 notebook contains the executed original/reduced-contrast image comparison. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect the original figure.
 
 ![Stage 1 shift metrics](results/stage1_shift_metrics.svg)
 
@@ -145,7 +145,7 @@ The most important changes are the drop in **AUROC** and the worsening of both *
 
 ### Precision-recall curve
 
-The Stage 1 notebook contains the executed precision-recall curve. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view it.
+The Stage 1 notebook contains the executed precision-recall curve. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect it.
 
 ---
 
@@ -174,7 +174,7 @@ The external target is **lung opacity**, whereas PneumoniaMNIST is a pneumonia c
 | Brier score | 0.2071 | **0.3579** |
 | ECE | 0.1114 | **0.4164** |
 
-The external evaluation shows a substantial reduction in classification performance and a much larger calibration error.
+At the fixed 0.50 classification threshold, the external evaluation shows a substantial reduction in classification performance. Calibration also deteriorates markedly, with ECE increasing from 0.1114 to 0.4164.
 
 ![External evaluation vs baseline](results/stage2_external_vs_stage1.svg)
 
@@ -250,7 +250,7 @@ On the full 25,684-study RSNA prediction set:
 
 The incorrect predictions were, on average, **more confident** than the correct predictions.
 
-That is one of the clearest trustworthy-AI findings in this project.
+This is a key reliability observation: under external evaluation, prediction confidence was not a useful proxy for correctness.
 
 ### High-confidence errors
 
@@ -261,7 +261,7 @@ There were:
 
 The most confident incorrect prediction had confidence **0.9698**.
 
-The Stage 4 notebook contains the executed confidence/error plots. [Open the Stage 4 notebook](notebooks/04_confidence_and_uncertainty_analysis.ipynb) to view the original figures.
+The Stage 4 notebook contains the executed confidence and error analysis plots. [Open the Stage 4 notebook](notebooks/04_confidence_and_uncertainty_analysis.ipynb) to inspect the original figures.
 
 ### Effect of temperature scaling on confidence
 
@@ -332,7 +332,7 @@ The Stage 5 notebook contains two different label-alignment paths. Its earlier e
 
 Because these two paths do not produce the same accuracy, this README **does not treat the earlier Stage 5 ensemble-performance table as a definitive result**. The uncertainty findings above are reported from the later, explicitly aligned uncertainty-analysis section.
 
-This is intentionally documented rather than hidden.
+The discrepancy is retained in the research record rather than treated as a single definitive ensemble-performance result.
 
 ---
 
@@ -358,7 +358,7 @@ On the external dataset, incorrect predictions had higher mean confidence than c
 
 The five-model disagreement analysis did not provide a reliable standalone error-ranking signal. Its AUROC for detecting incorrect predictions was **0.4225**.
 
-The negative result is important. A trustworthy-AI investigation should be willing to retain methods that do not work as expected.
+The negative Stage 5 result is retained because it is part of the empirical evidence.
 
 ---
 
@@ -417,11 +417,8 @@ trustworthy-ai-medical-imaging/
 │
 ├── notebooks/
 │   ├── 01_pneumoniamnist_baseline_and_shift.ipynb
-│   ├── 01_pneumoniamnist_baseline_and_shift_clean.ipynb
 │   ├── 02_rsna_external_evaluation.ipynb
-│   ├── 02_rsna_external_evaluation_clean.ipynb
 │   ├── 03_temperature_scaling_calibration.ipynb
-│   ├── 03_temperature_scaling_calibration_clean.ipynb
 │   ├── 04_confidence_and_uncertainty_analysis.ipynb
 │   └── 05_uncertainty_estimation.ipynb
 │
@@ -459,7 +456,7 @@ The RSNA data used for external evaluation must be obtained separately and are n
 
 The notebooks contain the experimental code, validation checks, saved prediction workflows and notebook outputs used to produce the reported results.
 
-The clean notebooks are organized so that the stages can be followed in order:
+The five notebooks are organized in experimental order:
 
 1. Run Stage 1 to train the baseline and evaluate the controlled image shift.
 2. Run Stage 2 to generate external RSNA predictions.
@@ -467,15 +464,15 @@ The clean notebooks are organized so that the stages can be followed in order:
 4. Run Stage 4 to analyse confidence and errors.
 5. Run Stage 5 to train the ensemble and analyse model disagreement.
 
-The original experiments were run in a Windows environment with the RSNA data stored separately. The repository therefore does not contain the medical data or model checkpoints.
+The experiments used the RSNA data separately from the repository. The repository does not contain the medical datasets or model checkpoints.
 
 ---
 
-# A note about execution in this review
+# Reproducibility note
 
-The uploaded notebooks contain executed outputs from the original experimental runs, including the image grids, reliability plots, metrics and Stage 5 analysis. I checked those stored outputs against the notebook code while rebuilding this README.
+The notebooks contain executed outputs from the experimental runs, including image examples, reliability plots, metrics and Stage 5 analysis.
 
-A completely fresh end-to-end execution is not claimed here because the uploaded environment does not contain the original RSNA DICOM dataset and the original Windows data paths referenced by Stages 2–5. The README therefore reports the **actual recorded notebook results**, rather than inventing a new rerun.
+A completely fresh end-to-end execution is not claimed here because the repository does not contain the RSNA DICOM dataset and the original local data paths are not part of the project. The README therefore reports the **recorded notebook results** rather than presenting an unverified rerun.
 
 ---
 
@@ -495,14 +492,6 @@ The next useful extensions would be:
 
 ---
 
-## Project focus
+## Research question revisited
 
-This project is not trying to answer:
-
-> “Can a model classify pneumonia?”
-
-It is asking the more difficult question:
-
-> **“When the model is wrong, does it know that it might be wrong?”**
-
-That is the reliability problem this project is designed to investigate.
+The project is not intended to establish a clinical pneumonia detector. It examines whether predictive performance, calibration, confidence and model disagreement remain informative when the evaluation data differ from the training distribution.
