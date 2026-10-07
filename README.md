@@ -2,6 +2,21 @@
 
 Research preparation project exploring calibration, confidence and uncertainty under distribution shift in medical image classification.
 
+## Key results
+
+| External evaluation | Before calibration | After temperature scaling |
+|---|---:|---:|
+| **AUROC** | **0.5641** | **0.5641** |
+| **Expected Calibration Error (ECE)** | **0.4175** | **0.3566** |
+| **Brier score** | 0.3590 | 0.3009 |
+| **Log loss** | 0.9685 | 0.8016 |
+
+The external evaluation covered **25,684 RSNA studies**. Temperature scaling improved probability quality while leaving discrimination unchanged.
+
+![External evaluation vs baseline](results/stage2_external_vs_stage1.svg)
+
+![Temperature scaling results](results/stage3_temperature_scaling.svg)
+
 ## Aim
 
 The project investigates a practical question:
@@ -45,18 +60,23 @@ Deep-ensemble uncertainty
 Stages 1–5 have been run and documented.
 
 ### Stage 1
+
 A small convolutional neural network was trained on PneumoniaMNIST. A controlled reduction in image contrast reduced discrimination and worsened calibration.
 
 ### Stage 2
+
 The Stage 1 model was evaluated without retraining on 25,684 RSNA studies. External performance and calibration degraded substantially.
 
 ### Stage 3
+
 Temperature scaling was fitted on one stratified portion of the RSNA predictions and evaluated on a held-out portion. Probability quality improved, while AUROC remained unchanged.
 
 ### Stage 4
+
 The analysis showed that the model could be more confident on incorrect predictions than on correct predictions. High-confidence errors were present in the external evaluation.
 
 ### Stage 5
+
 Five independently trained copies of the same small CNN were used to measure model disagreement. Disagreement showed a limited association with errors in the highest-disagreement subset, but it was not a reliable standalone uncertainty signal across the full dataset.
 
 ## Main findings
@@ -89,7 +109,6 @@ The experiments are intended to support methodological learning and research dis
 notebooks/       Experimental notebooks
 research_notes/  Research observations and stage results
 results/         Generated figures and result summaries
-src/             Reusable experiment code
 ```
 
 ## Data
