@@ -59,15 +59,11 @@ For Stage 3, the Stage 2 RSNA predictions were divided into a calibration subset
 
 ## Reproducibility
 
-The project uses a deliberately small convolutional neural network so the initial experiments can be reproduced on CPU hardware.
+The repository now includes a `src/` package for the corrected reanalysis. The source workflow uses five seeds (42, 43, 44, 45, 46), validation-loss early stopping, basic training augmentation, identifier-based prediction/label alignment, uncertainty baselines, and bootstrap confidence intervals.
 
-Stage 5 uses five independent random seeds:
+The RSNA data remain external and are not stored in the repository. See `data/README.md` and `src/README.md` for the expected local layout and commands.
 
-```text
-42, 43, 44, 45, 46
-```
-
-The Stage 2 prediction file is reused in Stage 4 so that confidence analysis is based on the same validated external predictions rather than rerunning inference.
+The executed notebooks remain preserved as the original experimental record.
 
 ## Scope
 
