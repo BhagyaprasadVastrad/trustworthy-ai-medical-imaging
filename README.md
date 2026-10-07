@@ -99,6 +99,8 @@ This is intentionally a controlled stress test. It is **not** intended to reprod
 
 The Stage 1 notebook contains the executed side-by-side original/reduced-contrast image comparison. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view the original figure.
 
+![Stage 1 shift metrics](results/stage1_shift_metrics.svg)
+
 ### Original vs reduced-contrast results
 
 | Metric | Original | Reduced contrast | Change |
@@ -145,6 +147,8 @@ The external target is **lung opacity**, whereas PneumoniaMNIST is a pneumonia c
 | ECE | 0.1114 | **0.4164** |
 
 The external evaluation shows a substantial reduction in classification performance and a much larger calibration error.
+
+![External evaluation vs baseline](results/stage2_external_vs_stage1.svg)
 
 The important point is not simply that accuracy fell. **The confidence quality also degraded.**
 
@@ -229,7 +233,7 @@ There were:
 
 The most confident incorrect prediction had confidence **0.9698**.
 
-![Confidence distribution](results/stage4_confidence_distribution.svg)
+The Stage 4 notebook contains the executed confidence/error plots. [Open the Stage 4 notebook](notebooks/04_confidence_and_uncertainty_analysis.ipynb) to view the original figures.
 
 ### Effect of temperature scaling on confidence
 
