@@ -33,6 +33,12 @@ For each study, the experiment records:
 
 Standard deviation is used as a simple model-disagreement proxy.
 
+## Evaluation-alignment note
+
+The notebook originally contained an ensemble-performance block that compared the ensemble predictions with `rsna_labels["label"]` in annotation order. The ensemble predictions were produced in DICOM-file order, so the reported ensemble values from that block (including AUROC 0.4938 and Brier score 0.4282) are **not treated as valid ensemble performance metrics**.
+
+The later uncertainty block uses the inference-order `all_labels` array and reports an aligned accuracy of 0.4236. The corrected `src/stage5.py` now enforces `StudyInstanceUID` alignment before calculating ensemble AUROC, accuracy and Brier score.
+
 ## Ensemble output
 
 The ensemble produced predictions for all 25,684 studies.
@@ -104,6 +110,12 @@ the experiment found:
 ```
 
 The ensemble therefore did not identify a group of cases where the models strongly disagreed while the ensemble remained highly confident.
+
+## Corrected reanalysis status
+
+The corrected multi-seed Stage 5 implementation has been added under `src/`. It also compares disagreement with one-minus-max-probability and predictive entropy and computes bootstrap confidence intervals.
+
+The corrected ensemble AUROC and Brier score have **not yet been rerun in this environment**, because the original RSNA DICOM data and ensemble checkpoints are not available here. They should be taken from the output of `python -m src.stage5`, not inferred from the invalid earlier block.
 
 ## Interpretation
 
