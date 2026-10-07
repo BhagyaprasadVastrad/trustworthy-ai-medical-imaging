@@ -8,3 +8,4 @@ models/
 results/generated/
 .DS_Store
 Thumbs.db
+research_data/
