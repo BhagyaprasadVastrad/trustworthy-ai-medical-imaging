@@ -71,9 +71,7 @@ The notebook uses:
 
 ### Example PneumoniaMNIST images
 
-The following figure is the actual image grid produced by the Stage 1 notebook:
-
-![PneumoniaMNIST examples](results/stage1_pneumonia_examples.svg)
+The Stage 1 notebook contains the actual PneumoniaMNIST image grid generated during the experiment. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view it.
 
 ## Baseline test results
 
@@ -91,7 +89,7 @@ The model has relatively high recall, while the calibration analysis shows that 
 
 ### Reliability diagram
 
-![Stage 1 reliability diagram](results/stage1_reliability.svg)
+The Stage 1 notebook also contains the executed reliability diagram. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view the original plot.
 
 ## Controlled reduced-contrast experiment
 
@@ -99,7 +97,7 @@ The trained model was kept unchanged while the test images were modified using a
 
 This is intentionally a controlled stress test. It is **not** intended to reproduce a real hospital-to-hospital distribution shift.
 
-![Original and reduced-contrast images](results/stage1_contrast_shift.svg)
+The Stage 1 notebook contains the executed side-by-side original/reduced-contrast image comparison. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view the original figure.
 
 ### Original vs reduced-contrast results
 
@@ -117,7 +115,7 @@ The most important changes are the drop in **AUROC** and the worsening of both *
 
 ### Precision-recall curve
 
-![Stage 1 precision-recall curve](results/stage1_precision_recall.svg)
+The Stage 1 notebook contains the executed precision-recall curve. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift_clean.ipynb) to view it.
 
 ---
 
@@ -387,8 +385,11 @@ trustworthy-ai-medical-imaging/
 │
 ├── notebooks/
 │   ├── 01_pneumoniamnist_baseline_and_shift.ipynb
+│   ├── 01_pneumoniamnist_baseline_and_shift_clean.ipynb
 │   ├── 02_rsna_external_evaluation.ipynb
+│   ├── 02_rsna_external_evaluation_clean.ipynb
 │   ├── 03_temperature_scaling_calibration.ipynb
+│   ├── 03_temperature_scaling_calibration_clean.ipynb
 │   ├── 04_confidence_and_uncertainty_analysis.ipynb
 │   └── 05_uncertainty_estimation.ipynb
 │
