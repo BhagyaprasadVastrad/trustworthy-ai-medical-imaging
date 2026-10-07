@@ -409,7 +409,10 @@ Important limitations include:
 6. **Single external dataset**  
    Stronger claims about robustness would require multiple external datasets and more realistic cross-site evaluation.
 
-7. **Binary image-only setting**  
+7. **Age and population shift**  
+   PneumoniaMNIST is derived from pediatric chest radiographs, while the RSNA dataset is primarily an adult chest-radiograph cohort. The age/population difference is therefore an important confounder when interpreting the external performance change.
+
+8. **Binary image-only setting**  
    The experiments do not incorporate structured clinical information or multimodal inputs.
 
 ---
@@ -455,6 +458,20 @@ Stage 1 uses PneumoniaMNIST through the MedMNIST package.
 The RSNA data used for external evaluation must be obtained separately and are not stored in the repository.
 
 ---
+
+# Corrected reanalysis workflow
+
+The repository now includes a `src/` package for the corrected analysis. It:
+
+- aligns predictions and labels by `StudyInstanceUID`,
+- repeats Stages 2–4 across seeds 42–46,
+- uses a longer baseline with validation-loss early stopping and basic augmentation,
+- compares ensemble disagreement with max-probability and entropy baselines,
+- and adds bootstrap 95% confidence intervals.
+
+The corrected multi-seed workflow has not been executed in this environment because the RSNA DICOM data and original local model checkpoints are not present here. The numerical results currently shown above therefore remain the recorded notebook results, rather than newly rerun results.
+
+See `src/README.md` for commands and `data/README.md` for the expected external-data layout.
 
 # Reproducibility
 
