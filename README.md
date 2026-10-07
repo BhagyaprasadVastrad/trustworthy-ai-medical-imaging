@@ -234,6 +234,8 @@ The repository now contains a small `src/` package for the next rigorous rerun:
 - `.github/workflows/quality.yml` — automated compile and test checks.
 - `data/README.md` — explicit external-data layout and non-redistribution policy.
 - `CITATION.cff` — citation metadata.
+- `scripts/final_reanalysis.py` — end-to-end corrected multi-seed runner.
+- `FINAL_RUN.md` — exact instructions for executing the final rerun.
 
 The corrected workflow is **implemented but not claimed as executed**. The RSNA DICOM data and original model checkpoints are not available in this environment, so no new numerical results are invented.
 
@@ -268,6 +270,18 @@ trustworthy-ai-medical-imaging/
 Medical datasets and model checkpoints are **not committed** to the repository.
 
 ---
+
+# Final rerun
+
+The corrected quantitative rerun is packaged as a single command. See [FINAL_RUN.md](FINAL_RUN.md) for the exact local setup and execution instructions.
+
+```bash
+python scripts/final_reanalysis.py --rsna-root "PATH_TO_YOUR_RSNA_DATASET"
+```
+
+The run is intentionally based on the original five-epoch SmallCNN protocol so that the multi-seed results remain directly comparable with the recorded Stage 1 experiment. It uses seeds 42–46 and does not upload or redistribute RSNA data.
+
+**Do not report new numbers until this script has actually completed.**
 
 # Running the checks
 
