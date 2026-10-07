@@ -8,6 +8,34 @@ The project deliberately goes beyond accuracy. It studies **performance, calibra
 
 ---
 
+## Visual results
+
+The repository includes the main result figures directly so the research story can be understood from the project page:
+
+![PneumoniaMNIST controlled shift metrics](results/stage1_shift_metrics.svg)
+
+*Controlled reduced-contrast shift: the same model is evaluated before and after the image transformation.*
+
+![External evaluation vs baseline](results/stage2_external_vs_stage1.svg)
+
+*External RSNA evaluation compared with the PneumoniaMNIST baseline.*
+
+![RSNA temperature scaling](results/stage3_temperature_scaling.svg)
+
+*Held-out RSNA reliability before and after temperature scaling.*
+
+The notebooks also contain the original executed figures that produced the analysis, including:
+
+- **PneumoniaMNIST sample images**
+- **Training and validation loss**
+- **PneumoniaMNIST reliability diagram**
+- **Original vs reduced-contrast image examples**
+- **Confidence vs observed accuracy**
+- **Confidence distribution for correct vs incorrect predictions**
+- **RSNA held-out reliability before vs after temperature scaling**
+
+These are preserved in the executed notebooks rather than recreated for the README.
+
 ## What this project investigates
 
 A medical model can still produce a prediction when the input distribution changes. The more important question is whether the **prediction and the confidence attached to it remain trustworthy**.
