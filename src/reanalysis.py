@@ -43,14 +43,14 @@ def infer(seed,df):
     rows=[]
     with torch.no_grad():
         for images,labels,uids in loader:
-            logits=model(images.to(device)); probs=torch.sigmoid(logits).cpu().numpy()
-            for uid,label,p in zip(uids,labels.numpy(),probs): rows.append((uid,int(label),float(p)))
-    out=pd.DataFrame(rows,columns=["StudyInstanceUID","label","probability"]).sort_values("StudyInstanceUID").reset_index(drop=True)
-    np.savez(RESEARCH_DATA_DIR/f"stage2_seed_{seed}.npz",study_uids=out.StudyInstanceUID.to_numpy(),labels=out.label.to_numpy(),probabilities=out.probability.to_numpy())
+            logits=model(images.to(device)); probs=torch.sigmoid(logits).cpu().numpy(); raw=logits.cpu().numpy()
+            for uid,label,z,p in zip(uids,labels.numpy(),raw,probs): rows.append((uid,int(label),float(z),float(p)))
+    out=pd.DataFrame(rows,columns=["StudyInstanceUID","label","logit","probability"]).sort_values("StudyInstanceUID").reset_index(drop=True)
+    np.savez(RESEARCH_DATA_DIR/f"stage2_seed_{seed}.npz",study_uids=out.StudyInstanceUID.to_numpy(),labels=out.label.to_numpy(),logits=out.logit.to_numpy(),probabilities=out.probability.to_numpy())
     return out
 
 def stage3_4(seed,data):
-    labels=data["labels"]; probs=data["probabilities"]; logits=np.log(np.clip(probs,1e-8,1-1e-8)/(1-np.clip(probs,1e-8,1-1e-8)))
+    labels=data["labels"]; probs=data["probabilities"]; logits=data["logits"]
     idx=np.arange(len(labels)); cal,ev=train_test_split(idx,test_size=.5,stratify=labels,random_state=42)
     x=torch.tensor(logits[cal],dtype=torch.float32); y=torch.tensor(labels[cal],dtype=torch.float32)
     lt=torch.nn.Parameter(torch.zeros(1)); opt=torch.optim.LBFGS([lt],lr=.01,max_iter=100); loss_fn=torch.nn.BCEWithLogitsLoss()
@@ -68,8 +68,8 @@ def main():
         path=RESEARCH_DATA_DIR/f"stage2_seed_{seed}.npz"
         if not (a.skip_inference and path.exists()): infer(seed,df)
         d=np.load(path,allow_pickle=True)
-        if len(d["study_uids"])!=len(d["labels"])!=len(d["probabilities"]): raise ValueError("Prediction arrays differ in length")
-        uids=d["study_uids"].astype(str); order=np.argsort(uids); d2={"labels":d["labels"][order].astype(int),"probabilities":d["probabilities"][order].astype(float)}
+        if not (len(d["study_uids"]) == len(d["labels"]) == len(d["logits"]) == len(d["probabilities"])): raise ValueError("Prediction arrays differ in length")
+        uids=d["study_uids"].astype(str); order=np.argsort(uids); d2={"labels":d["labels"][order].astype(int),"logits":d["logits"][order].astype(float),"probabilities":d["probabilities"][order].astype(float)}
         results.append(stage3_4(seed,d2))
     with open(RESEARCH_DATA_DIR/"multiseed_stage2_to_4.json","w",encoding="utf-8") as f: json.dump(results,f,indent=2)
     print(json.dumps(results,indent=2))
