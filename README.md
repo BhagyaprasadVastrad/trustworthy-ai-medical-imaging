@@ -10,21 +10,21 @@ The project deliberately goes beyond accuracy. It studies **performance, calibra
 
 ## Visual results
 
-The repository includes the main result figures directly so the research story can be understood from the project page:
+The `results/` directory contains compact summary figures for the main quantitative comparisons. The executed notebook plots remain in the notebooks and are the primary visual record of the experiments.
 
-![PneumoniaMNIST controlled shift metrics](results/stage1_shift_metrics.svg)
+![PneumoniaMNIST controlled shift summary](results/stage1_shift_metrics.svg)
 
 *Controlled reduced-contrast shift: the same model is evaluated before and after the image transformation.*
 
-![External evaluation vs baseline](results/stage2_external_vs_stage1.svg)
+![External evaluation summary](results/stage2_external_vs_stage1.svg)
 
 *External RSNA evaluation compared with the PneumoniaMNIST baseline.*
 
-![RSNA temperature scaling](results/stage3_temperature_scaling.svg)
+![Temperature scaling summary](results/stage3_temperature_scaling.svg)
 
 *Held-out RSNA reliability before and after temperature scaling.*
 
-The notebooks also contain the original executed figures that produced the analysis, including:
+The executed notebooks contain the original figures used in the analysis, including:
 
 - **PneumoniaMNIST sample images**
 - **Training and validation loss**
@@ -35,6 +35,10 @@ The notebooks also contain the original executed figures that produced the analy
 - **RSNA held-out reliability before vs after temperature scaling**
 
 These are preserved in the executed notebooks rather than recreated for the README.
+
+## Research record
+
+Stage-specific observations and limitations are documented in [`research_notes/`](research_notes/). `FINAL_RESEARCH_SUMMARY.md` records the consolidated results and `SETUP.md` documents the data and reproducibility constraints.
 
 ## What this project investigates
 
