@@ -72,5 +72,14 @@ def main():
         uids=d["study_uids"].astype(str); order=np.argsort(uids); d2={"labels":d["labels"][order].astype(int),"logits":d["logits"][order].astype(float),"probabilities":d["probabilities"][order].astype(float)}
         results.append(stage3_4(seed,d2))
     with open(RESEARCH_DATA_DIR/"multiseed_stage2_to_4.json","w",encoding="utf-8") as f: json.dump(results,f,indent=2)
-    print(json.dumps(results,indent=2))
+    rows=[]
+    for r in results:
+        row={"seed":r["seed"],"temperature":r["temperature"],"stage2_accuracy":r["stage2"]["accuracy"],"stage2_auroc":r["stage2"]["auroc"],"stage2_brier":r["stage2"]["brier"],"stage2_ece":r["stage2"]["ece"],"stage3_before_brier":r["stage3_before"]["brier"],"stage3_after_brier":r["stage3_after"]["brier"],"stage3_before_auroc":r["stage3_before"]["auroc"],"stage3_after_auroc":r["stage3_after"]["auroc"],"stage4_accuracy":r["stage4_accuracy"]}
+        rows.append(row)
+    table=pd.DataFrame(rows)
+    summary={col:{"mean":float(table[col].mean()),"std":float(table[col].std(ddof=1))} for col in table.columns if col!="seed"}
+    table.to_csv(RESEARCH_DATA_DIR/"multiseed_stage2_to_4_by_seed.csv",index=False)
+    with open(RESEARCH_DATA_DIR/"multiseed_stage2_to_4_summary.json","w",encoding="utf-8") as f: json.dump(summary,f,indent=2)
+    print(table.to_string(index=False))
+    print(json.dumps(summary,indent=2))
 if __name__=="__main__": main()
