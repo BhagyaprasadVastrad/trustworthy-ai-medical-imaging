@@ -150,6 +150,12 @@ The project therefore did not end with a claim that one uncertainty method solve
 
 Instead, the experiments showed why reliability needs to be measured from several angles.
 
+## Reanalysis status
+
+The quantitative results above are the recorded notebook results from the original single-seed experiment unless explicitly stated otherwise. A corrected `src/` workflow has now been added to rerun Stages 2–4 across seeds 42–46 and to recompute Stage 5 with identifier-based prediction/label alignment. It also adds simple uncertainty baselines and bootstrap confidence intervals.
+
+Those corrected multi-seed runs have **not been executed in this environment** because the external RSNA DICOM data and local model checkpoints are not present here. Therefore no new multi-seed numerical result is presented as if it had been rerun.
+
 ## Limitations
 
 This is a research preparation project, not a clinical validation study.
@@ -162,7 +168,7 @@ The main limitations are:
 - The ensemble contains only five models.
 - Ensemble standard deviation is a model-disagreement proxy, not a complete uncertainty decomposition.
 - The external evaluation uses one dataset.
-- The experiments focus on binary image-only classification.
+- PneumoniaMNIST is derived from pediatric chest radiographs, while the RSNA dataset is primarily an adult chest-radiograph cohort. This age/distribution gap is an important confounder when interpreting the external performance drop.\n- The experiments focus on binary image-only classification.
 
 ## Future direction
 
