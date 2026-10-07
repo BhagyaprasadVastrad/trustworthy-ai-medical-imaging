@@ -4,7 +4,7 @@
 
 Stage 2 asks:
 
-> **Does calibration learned on one dataset remain reliable when the model encounters a different data distribution?**
+> **Does the Stage 1 model maintain its predictive and calibration behaviour when evaluated on an external dataset?**
 
 The purpose of this stage is to evaluate whether the Stage 1 model maintains similar predictive and probability-calibration behaviour on an external chest X-ray dataset.
 
