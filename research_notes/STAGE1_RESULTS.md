@@ -149,7 +149,7 @@ The learned temperature was **0.9243**.
 
 The test set was not used to learn the temperature.
 
-## 12. Temperature scaling results
+## 12. Exploratory temperature scaling results
 
 ### Expected Calibration Error
 
