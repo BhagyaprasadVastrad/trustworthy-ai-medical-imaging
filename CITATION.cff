@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: "Trustworthy AI for Medical Imaging"
+type: software
+message: "If you use this repository or its analysis, please cite it as follows."
+authors:
+  - family-names: Vastrad
+    given-names: Bhagyaprasad
+repository-code: "https://github.com/BhagyaprasadVastrad/trustworthy-ai-medical-imaging"
+abstract: "Research-preparation study investigating calibration, confidence and uncertainty of a small medical-imaging classifier under controlled and external distribution shift."
+keywords:
+  - trustworthy AI
+  - medical imaging
+  - calibration
+  - uncertainty
+  - distribution shift
+  - chest X-ray
