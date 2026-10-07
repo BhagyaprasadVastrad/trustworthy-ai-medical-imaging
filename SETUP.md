@@ -52,10 +52,10 @@ The experiments keep model fitting separate from final evaluation wherever appli
 For Stage 1:
 
 - Training set: fit the model.
-- Validation set: model selection and temperature scaling.
-- Test set: final evaluation.
+- Validation set: model selection during the baseline run.
+- Test set: final evaluation and the controlled contrast-shift experiment.
 
-For Stage 3, the RSNA predictions were divided into a calibration subset and a separate held-out evaluation subset. The temperature parameter was fitted on the calibration subset only.
+For Stage 3, the Stage 2 RSNA predictions were divided into a calibration subset and a separate held-out evaluation subset. The temperature parameter was fitted on the calibration subset only and then evaluated on the held-out subset.
 
 ## Reproducibility
 
