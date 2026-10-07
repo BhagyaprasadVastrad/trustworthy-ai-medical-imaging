@@ -95,7 +95,7 @@ def metrics(y: np.ndarray, p: np.ndarray) -> dict[str, float]:
     }
 
 
-def train_model(seed: int, device: torch.device, output_dir: Path) -> tuple[SmallCNN, list[dict]]:
+def train_model(seed: int, device: torch.device, output_dir: Path, epochs: int) -> tuple[SmallCNN, list[dict]]:
     set_seed(seed)
     transform = transforms.ToTensor()
     train_ds = PneumoniaMNIST(split="train", download=True, transform=transform, size=64)
@@ -108,7 +108,7 @@ def train_model(seed: int, device: torch.device, output_dir: Path) -> tuple[Smal
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     history = []
 
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         model.train()
         train_total = 0.0
         for images, labels in train_loader:
@@ -137,7 +137,7 @@ def train_model(seed: int, device: torch.device, output_dir: Path) -> tuple[Smal
         }
         history.append(row)
         print(
-            f"[seed {seed}] epoch {epoch + 1}/{EPOCHS} "
+            f"[seed {seed}] epoch {epoch + 1}/{epochs} "
             f"train={row['train_loss']:.4f} val={row['val_loss']:.4f}"
         )
 
@@ -294,7 +294,7 @@ def calibration_analysis(df: pd.DataFrame, seed: int) -> dict[str, float]:
         df,
         test_size=0.5,
         stratify=df["label"],
-        random_state=seed,
+        random_state=42,
     )
     temperature = fit_temperature(
         train["label"].to_numpy(),
@@ -356,9 +356,6 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, nargs="+", default=SEEDS)
     args = parser.parse_args()
 
-    global EPOCHS
-    EPOCHS = args.epochs
-
     project_output = args.output.resolve()
     checkpoint_dir = project_output / "checkpoints"
     prediction_dir = project_output / "predictions"
@@ -393,7 +390,7 @@ def main() -> None:
     prediction_files = []
 
     for seed in args.seeds:
-        model, history = train_model(seed, device, checkpoint_dir)
+        model, history = train_model(seed, device, checkpoint_dir, args.epochs)
         histories.extend(history)
 
         pred_df = predict_rsna(model, dicom_table, device)
