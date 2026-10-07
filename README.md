@@ -1,16 +1,30 @@
 # Trustworthy AI for Medical Imaging
 
-A research-preparation project investigating whether confidence and uncertainty remain reliable when a medical imaging model is evaluated under changed image appearance and external data.
+A research-preparation project investigating whether predictive performance, calibration, confidence and uncertainty remain reliable when a medical imaging model is evaluated under controlled and external distribution shift.
 
 > **Research question:** How reliable is a medical imaging model when it is used outside the data it was originally trained on?
 
-The project deliberately goes beyond accuracy. It studies **performance, calibration, confidence, and model disagreement** across a sequence of controlled experiments.
+The project deliberately goes beyond accuracy. It studies **performance, calibration, confidence and model disagreement** across a sequence of controlled experiments.
+
+---
+
+## At a glance
+
+| Stage | Experiment | Main question |
+|---|---|---|
+| 1 | PneumoniaMNIST baseline + reduced contrast | Does controlled image shift affect performance and calibration? |
+| 2 | External RSNA evaluation | Does behaviour transfer to a different dataset? |
+| 3 | Temperature scaling | Can post-hoc calibration improve probability quality? |
+| 4 | Confidence/error analysis | Can the model be confidently wrong? |
+| 5 | Five-model ensemble | Does model disagreement help identify errors? |
+
+**Important:** the headline numbers below are the **recorded notebook results**. The corrected multi-seed workflow is now implemented as reusable source code, but it has not been claimed as executed because the required RSNA data and original local checkpoints are not present in this environment.
 
 ---
 
 ## Visual results
 
-The `results/` directory contains compact summary figures for the main quantitative comparisons. The executed notebook plots remain in the notebooks and are the primary visual record of the experiments.
+The `results/` directory contains compact summary figures for the main quantitative comparisons.
 
 ![PneumoniaMNIST controlled shift summary](results/stage1_shift_metrics.svg)
 
@@ -24,88 +38,17 @@ The `results/` directory contains compact summary figures for the main quantitat
 
 *Held-out RSNA reliability before and after temperature scaling.*
 
-The executed notebooks contain the original figures used in the analysis, including:
-
-- **PneumoniaMNIST sample images**
-- **Training and validation loss**
-- **PneumoniaMNIST reliability diagram**
-- **Original vs reduced-contrast image examples**
-- **Confidence vs observed accuracy**
-- **Confidence distribution for correct vs incorrect predictions**
-- **RSNA held-out reliability before vs after temperature scaling**
-
-These are preserved in the executed notebooks rather than recreated for the README.
-
-## Research record
-
-Stage-specific observations and limitations are documented in [`research_notes/`](research_notes/). `FINAL_RESEARCH_SUMMARY.md` records the consolidated results and `SETUP.md` documents the data and reproducibility constraints.
-
-## What this project investigates
-
-A medical model can still produce a prediction when the input distribution changes. The more important question is whether the **prediction and the confidence attached to it remain trustworthy**.
-
-This project therefore asks:
-
-- Does a controlled change in image appearance affect model performance?
-- Does performance transfer to an external dataset?
-- Are the model's probabilities calibrated?
-- Can the model be highly confident when it is wrong?
-- Can disagreement between independently trained models provide a useful uncertainty signal?
-
----
-
-## Research pipeline
-
-```text
-Stage 1
-PneumoniaMNIST baseline
-        │
-        ▼
-Controlled reduced-contrast shift
-        │
-        ▼
-Stage 2
-External evaluation on RSNA
-        │
-        ▼
-Stage 3
-Temperature scaling
-        │
-        ▼
-Stage 4
-Confidence and error analysis
-        │
-        ▼
-Stage 5
-Deep-ensemble disagreement
-```
-
-Each stage uses the output of the previous stage so that the investigation moves from basic model behaviour toward reliability under external shift.
+The executed notebooks contain the original visual record, including sample images, loss curves, reliability diagrams, confidence distributions and precision-recall analysis.
 
 ---
 
 # Stage 1 — Baseline and controlled image shift
 
-## Baseline model
+A small convolutional neural network (SmallCNN) was trained on **PneumoniaMNIST** using 64 × 64 grayscale inputs, PyTorch, binary classification and seed 42.
 
-A small convolutional neural network (SmallCNN) was trained on **PneumoniaMNIST**.
+The goal was not to build a state-of-the-art classifier. The model provides a controlled setting for studying reliability.
 
-The purpose was not to build a state-of-the-art medical imaging classifier. The model provides a controlled experimental setting for studying prediction quality and confidence.
-
-The notebook uses:
-
-- PneumoniaMNIST
-- 64 × 64 grayscale inputs
-- PyTorch
-- Binary classification
-- A fixed random seed of 42
-- A training / validation / test split supplied by PneumoniaMNIST
-
-### Example PneumoniaMNIST images
-
-The Stage 1 notebook contains the executed PneumoniaMNIST image examples. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect the original output.
-
-## Baseline test results
+### Baseline test results
 
 | Metric | Original test set |
 |---|---:|
@@ -117,23 +60,11 @@ The Stage 1 notebook contains the executed PneumoniaMNIST image examples. [Open 
 | Brier score | **0.2071** |
 | Expected Calibration Error (ECE) | **0.1114** |
 
-The model has relatively high recall, while the calibration analysis shows that its confidence is not perfectly aligned with observed accuracy.
-
-### Reliability diagram
-
-The Stage 1 notebook contains the executed reliability diagram. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect the original plot.
-
-## Controlled reduced-contrast experiment
+### Controlled reduced-contrast experiment
 
 The trained model was kept unchanged while the test images were modified using a **contrast factor of 0.5**.
 
-This is intentionally a controlled stress test. It is **not** intended to reproduce a real hospital-to-hospital distribution shift.
-
-The Stage 1 notebook contains the executed original/reduced-contrast image comparison. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect the original figure.
-
-![Stage 1 shift metrics](results/stage1_shift_metrics.svg)
-
-### Original vs reduced-contrast results
+This is a controlled stress test, **not a realistic hospital-to-hospital shift**.
 
 | Metric | Original | Reduced contrast | Change |
 |---|---:|---:|---:|
@@ -145,11 +76,7 @@ The Stage 1 notebook contains the executed original/reduced-contrast image compa
 | Brier score | 0.2071 | 0.2828 | +0.0757 |
 | ECE | 0.1114 | 0.2534 | +0.1420 |
 
-The most important changes are the drop in **AUROC** and the worsening of both **Brier score** and **ECE**. The model's ranking ability and probability quality both deteriorated under the controlled image change.
-
-### Precision-recall curve
-
-The Stage 1 notebook contains the executed precision-recall curve. [Open the Stage 1 notebook](notebooks/01_pneumoniamnist_baseline_and_shift.ipynb) to inspect it.
+The main observation is that both discrimination and probability quality deteriorated under the controlled image change.
 
 ---
 
@@ -164,9 +91,7 @@ The external evaluation contained:
 - **5,659 Lung Opacity**
 - 25,684 matched DICOM images / study-level labels
 
-The external target is **lung opacity**, whereas PneumoniaMNIST is a pneumonia classification task. These targets are related, but they are **not identical**. Therefore this experiment should be described as an external-dataset stress test, not as direct clinical validation.
-
-### External evaluation
+The external target is **lung opacity**, whereas PneumoniaMNIST is a pneumonia classification task. These targets are related, but **not identical**. This is therefore an external-dataset stress test, not direct clinical validation.
 
 | Metric | PneumoniaMNIST baseline | RSNA external evaluation |
 |---|---:|---:|
@@ -178,11 +103,7 @@ The external target is **lung opacity**, whereas PneumoniaMNIST is a pneumonia c
 | Brier score | 0.2071 | **0.3579** |
 | ECE | 0.1114 | **0.4164** |
 
-At the fixed 0.50 classification threshold, the external evaluation shows a substantial reduction in classification performance. Calibration also deteriorates markedly, with ECE increasing from 0.1114 to 0.4164.
-
-![External evaluation vs baseline](results/stage2_external_vs_stage1.svg)
-
-The important point is not simply that accuracy fell. **The confidence quality also degraded.**
+At the fixed 0.50 threshold, classification performance fell substantially. Calibration also deteriorated markedly.
 
 ---
 
@@ -192,22 +113,10 @@ Stage 3 asks whether post-hoc calibration can improve probability quality withou
 
 The 25,684 RSNA predictions were split into two equal, stratified subsets:
 
-- **12,842 observations** for fitting the temperature
-- **12,842 observations** held out for evaluation
+- **12,842** for fitting the temperature
+- **12,842** held out for evaluation
 
-The learned temperature was:
-
-**T = 2.0350**
-
-Temperature scaling was applied to the logits using:
-
-```text
-calibrated probability = sigmoid(logit / T)
-```
-
-The classifier itself was not retrained.
-
-## Held-out calibration results
+The learned temperature was **T = 2.0350**.
 
 | Metric | Before | After | Change |
 |---|---:|---:|---:|
@@ -216,28 +125,11 @@ The classifier itself was not retrained.
 | ECE | 0.4175 | **0.3566** | -0.0608 |
 | AUROC | 0.5641 | **0.5641** | 0.0000 |
 
-![Temperature scaling reliability](results/stage3_temperature_scaling.svg)
-
-### What this shows
-
-Temperature scaling improved the quality of the probabilities on the held-out RSNA subset:
-
-- Brier score decreased.
-- Log loss decreased.
-- ECE decreased.
-- AUROC remained unchanged.
-
-This is an important distinction:
-
-> **Calibration and discrimination are different properties of a model.**
-
-A model can become better calibrated without becoming better at ranking positive and negative cases.
+This demonstrates the distinction between **calibration and discrimination**: probability quality improved while AUROC remained unchanged.
 
 ---
 
 # Stage 4 — Confidence and error analysis
-
-Stage 4 examines whether the model's confidence is actually informative about correctness.
 
 On the full 25,684-study RSNA prediction set:
 
@@ -245,76 +137,43 @@ On the full 25,684-study RSNA prediction set:
 - **16,338 predictions were incorrect**
 - Overall accuracy was **0.3639**
 
-### Confidence comparison
-
 | Prediction outcome | Mean confidence | Median confidence |
 |---|---:|---:|
 | Correct | 0.6384 | 0.6041 |
 | Incorrect | **0.6817** | **0.6588** |
 
-The incorrect predictions were, on average, **more confident** than the correct predictions.
+Incorrect predictions were, on average, **more confident** than correct predictions.
 
-This is a key reliability observation: under external evaluation, prediction confidence was not a useful proxy for correctness.
-
-### High-confidence errors
-
-There were:
-
-- **874 incorrect predictions with confidence ≥ 0.90**
-- **3.40% of all RSNA predictions**
-
-The most confident incorrect prediction had confidence **0.9698**.
-
-The Stage 4 notebook contains the executed confidence and error analysis plots. [Open the Stage 4 notebook](notebooks/04_confidence_and_uncertainty_analysis.ipynb) to inspect the original figures.
-
-### Effect of temperature scaling on confidence
+There were **874 incorrect predictions with confidence ≥ 0.90**, representing **3.40% of all predictions**. The most confident incorrect prediction had confidence **0.9698**.
 
 On the same external predictions, the notebook reports:
 
-| Measure | Before | After |
+| Measure | Before | After temperature scaling |
 |---|---:|---:|
 | Mean confidence | 0.6659 | 0.5909 |
 | Median confidence | 0.6369 | 0.5686 |
-| High-confidence errors (≥0.90) | 874 | **0** |
+| High-confidence errors ≥ 0.90 | 874 | **0** |
 
-The corresponding probability-quality metrics improved:
-
-| Metric | Before | After |
-|---|---:|---:|
-| Brier score | 0.3579 | 0.3003 |
-| Log loss | 0.9652 | 0.8003 |
-| AUROC | 0.5640 | 0.5640 |
-
-These full-dataset numbers are kept separate from the Stage 3 held-out evaluation numbers because they answer a different question.
+The full-dataset Brier score improved from **0.3579 to 0.3003**, while AUROC remained **0.5640**.
 
 ---
 
 # Stage 5 — Deep-ensemble disagreement
 
-Stage 5 asks whether model disagreement can provide an additional uncertainty signal.
-
 Five independently initialized copies of the same SmallCNN architecture were trained using seeds:
 
-```text
-42, 43, 44, 45, 46
-```
+`42, 43, 44, 45, 46`
 
-The models were evaluated on the same external RSNA images. For each study, the standard deviation of the five predicted probabilities was used as a **model-disagreement proxy**.
+The standard deviation of the five predicted probabilities was used as a **model-disagreement proxy**.
 
-### Disagreement analysis
-
-Using the later, label-aligned uncertainty analysis in the notebook:
+The later, label-aligned uncertainty analysis reported:
 
 | Outcome | Count | Mean disagreement | Median disagreement |
 |---|---:|---:|---:|
 | Correct | 10,880 | 0.101513 | 0.104394 |
 | Incorrect | 14,804 | 0.093461 | 0.091569 |
 
-The disagreement-based error-detection AUROC was:
-
-**0.4225**
-
-A value below 0.50 means that, in this experiment, higher disagreement did **not** reliably correspond to incorrect predictions.
+Disagreement-based error-detection AUROC was **0.4225**.
 
 The top 10% most-disagreeing cases had:
 
@@ -323,97 +182,60 @@ The top 10% most-disagreeing cases had:
 - Overall error rate: **57.64%**
 - Difference: **+4.72 percentage points**
 
-So the highest-disagreement group contained somewhat more errors, but the full ranking signal was not reliable.
+The result is intentionally retained as a **negative finding**: disagreement showed a weak signal in the highest-disagreement subset, but was not a reliable standalone error-ranking method.
 
-The notebook also found **no cases** that simultaneously met:
+### Alignment correction
 
-- ensemble confidence ≥ 0.90
-- top-10% disagreement threshold
+The original Stage 5 notebook contains an earlier ensemble-performance path and a later explicitly aligned uncertainty path that do not produce the same ensemble accuracy. The earlier ensemble-performance values are therefore **not treated as definitive results**.
 
-## Important Stage 5 note
-
-The Stage 5 notebook contains two different label-alignment paths. Its earlier ensemble-performance block reports a separate set of ensemble accuracy/AUROC/Brier/log-loss values, while the later uncertainty analysis uses `all_labels` and reports accuracy of 0.4236.
-
-Because these two paths do not produce the same accuracy, this README **does not treat the earlier Stage 5 ensemble-performance table as a definitive result**. The uncertainty findings above are reported from the later, explicitly aligned uncertainty-analysis section.
-
-The discrepancy is retained in the research record rather than treated as a single definitive ensemble-performance result.
+The corrected source workflow now enforces `StudyInstanceUID` alignment before ensemble analysis. It also adds comparison baselines and bootstrap confidence intervals.
 
 ---
 
 # Main findings
 
-## 1. Image appearance changes can affect reliability
+1. **Controlled image changes can affect reliability.** Reduced contrast lowered AUROC from 0.7861 to 0.6909 and increased ECE from 0.1114 to 0.2534.
 
-Reducing contrast from the original PneumoniaMNIST test images reduced AUROC from **0.7861 to 0.6909** and increased ECE from **0.1114 to 0.2534**.
+2. **External evaluation exposed substantial degradation.** Accuracy fell to 0.3639 and AUROC to 0.5640, while ECE increased to 0.4164.
 
-## 2. External evaluation exposed substantial degradation
+3. **Calibration is not discrimination.** Temperature scaling improved Brier score, log loss and ECE while leaving AUROC unchanged.
 
-When the Stage 1 model was used on the external RSNA dataset without retraining, accuracy fell to **0.3639** and AUROC to **0.5640**, while ECE increased to **0.4164**.
+4. **The model can be confidently wrong.** Incorrect predictions were more confident on average, including 874 errors with confidence at least 0.90.
 
-## 3. Calibration is not the same as discrimination
-
-Temperature scaling improved Brier score, log loss and ECE on the held-out RSNA subset, while AUROC remained **0.5641**.
-
-## 4. The model can be confidently wrong
-
-On the external dataset, incorrect predictions had higher mean confidence than correct predictions, and **874 incorrect predictions** had confidence of at least 0.90.
-
-## 5. Uncertainty methods should be tested, not assumed to work
-
-The five-model disagreement analysis did not provide a reliable standalone error-ranking signal. Its AUROC for detecting incorrect predictions was **0.4225**.
-
-The negative Stage 5 result is retained because it is part of the empirical evidence.
-
----
-
-# Why these experiments matter
-
-The project illustrates a central issue in trustworthy medical AI:
-
-> A prediction can be wrong while still looking confident.
-
-Accuracy alone would not reveal this.
-
-A model can have:
-
-- acceptable performance on its development distribution,
-- degraded performance under external evaluation,
-- poor calibration under shift,
-- and high confidence on incorrect cases.
-
-For this reason, the project treats **discrimination, calibration, confidence and uncertainty as separate properties** that need to be evaluated together.
+5. **Uncertainty methods should be tested, not assumed to work.** The five-model disagreement analysis did not provide a reliable standalone error-ranking signal.
 
 ---
 
 # Limitations
 
-This project is a **research-preparation study**, not a clinical validation study.
+This is a **research-preparation study**, not a clinical validation study.
 
-Important limitations include:
+1. **Small baseline model:** deliberately simple CNN rather than a state-of-the-art medical imaging architecture.
+2. **Different external targets:** PneumoniaMNIST is pneumonia classification; RSNA labels used here are study-level lung-opacity labels.
+3. **Artificial image shift:** reduced contrast is a controlled stress test, not a realistic hospital shift.
+4. **Limited ensemble size:** Stage 5 uses five models.
+5. **Simple disagreement proxy:** standard deviation does not capture all forms of uncertainty.
+6. **Single external dataset:** stronger robustness claims require multiple external datasets.
+7. **Population shift:** PneumoniaMNIST is derived from pediatric chest radiographs, while the RSNA cohort is primarily adult. Age/population shift is therefore an important confounder.
+8. **Image-only binary setting:** structured clinical information and multimodal inputs are not included.
 
-1. **Small baseline model**  
-   The experiments use a deliberately small CNN rather than a state-of-the-art medical imaging architecture.
+---
 
-2. **Different external targets**  
-   PneumoniaMNIST is a pneumonia classification dataset, while the RSNA external labels used here are study-level lung-opacity labels. They are related but not identical.
+# Corrected reproducibility workflow
 
-3. **Artificial image shift**  
-   The reduced-contrast experiment is a controlled stress test. It should not be interpreted as a realistic hospital-to-hospital shift.
+The repository now contains a small `src/` package for the next rigorous rerun:
 
-4. **Limited ensemble size**  
-   Stage 5 uses only five independently trained models.
+- `src/alignment.py` — identifier-based prediction/label alignment.
+- `src/metrics.py` — centralised metrics and bootstrap confidence intervals.
+- `src/calibration.py` — auditable temperature scaling.
+- `src/stage5.py` — corrected ensemble analysis plus uncertainty baselines.
+- `tests/` — unit tests for alignment and metrics.
+- `docs/RESEARCH_PROTOCOL.md` — pre-specified analysis protocol.
+- `.github/workflows/quality.yml` — automated compile and test checks.
+- `data/README.md` — explicit external-data layout and non-redistribution policy.
+- `CITATION.cff` — citation metadata.
 
-5. **Simple disagreement proxy**  
-   Prediction standard deviation measures model disagreement but is not a complete treatment of epistemic and aleatoric uncertainty.
-
-6. **Single external dataset**  
-   Stronger claims about robustness would require multiple external datasets and more realistic cross-site evaluation.
-
-7. **Age and population shift**  
-   PneumoniaMNIST is derived from pediatric chest radiographs, while the RSNA dataset is primarily an adult chest-radiograph cohort. The age/population difference is therefore an important confounder when interpreting the external performance change.
-
-8. **Binary image-only setting**  
-   The experiments do not incorporate structured clinical information or multimodal inputs.
+The corrected workflow is **implemented but not claimed as executed**. The RSNA DICOM data and original model checkpoints are not available in this environment, so no new numerical results are invented.
 
 ---
 
@@ -421,98 +243,59 @@ Important limitations include:
 
 ```text
 trustworthy-ai-medical-imaging/
-│
 ├── notebooks/
-│   ├── 01_pneumoniamnist_baseline_and_shift.ipynb
-│   ├── 02_rsna_external_evaluation.ipynb
-│   ├── 03_temperature_scaling_calibration.ipynb
-│   ├── 04_confidence_and_uncertainty_analysis.ipynb
-│   └── 05_uncertainty_estimation.ipynb
-│
 ├── research_notes/
-│   ├── STAGE1_RESULTS.md
-│   ├── STAGE2_RESULTS.md
-│   ├── STAGE3_RESULTS.md
-│   ├── STAGE4_RESULTS.md
-│   └── STAGE5_RESULTS.md
-│
 ├── results/
-│   ├── stage1_shift_metrics.svg
-│   ├── stage2_external_vs_stage1.svg
-│   └── stage3_temperature_scaling.svg
-│
+├── src/
+│   ├── alignment.py
+│   ├── calibration.py
+│   ├── metrics.py
+│   ├── stage5.py
+│   └── README.md
+├── tests/
+├── data/
+│   └── README.md
+├── docs/
+│   └── RESEARCH_PROTOCOL.md
 ├── FINAL_RESEARCH_SUMMARY.md
 ├── SETUP.md
 ├── requirements.txt
+├── pyproject.toml
+├── CITATION.cff
 └── README.md
+```
+
+Medical datasets and model checkpoints are **not committed** to the repository.
+
+---
+
+# Running the checks
+
+```bash
+python -m pip install -e .
+pytest -q
+```
+
+For the corrected Stage 5 analysis:
+
+```bash
+python -m src.stage5 \
+  --labels data/rsna/labels.csv \
+  --predictions data/predictions/seed42.csv data/predictions/seed43.csv data/predictions/seed44.csv data/predictions/seed45.csv data/predictions/seed46.csv
 ```
 
 ---
 
-# Data
+# Data and claims boundary
 
-The medical datasets are **not redistributed in this repository**.
+Stage 1 uses PneumoniaMNIST through MedMNIST. The RSNA dataset must be obtained separately.
 
-Stage 1 uses PneumoniaMNIST through the MedMNIST package.
+This project does **not** establish clinical safety, clinical usefulness, hospital-level generalisation, or a validated pneumonia detector.
 
-The RSNA data used for external evaluation must be obtained separately and are not stored in the repository.
+Its current contribution is methodological: documenting how calibration, confidence and uncertainty can fail under dataset change, while providing a reproducible framework for a more rigorous multi-seed study.
 
----
+## Status
 
-# Corrected reanalysis workflow
+**Research preparation: Stages 1–5 documented; corrected reanalysis workflow implemented.**
 
-The repository now includes a `src/` package for the corrected analysis. It:
-
-- aligns predictions and labels by `StudyInstanceUID`,
-- repeats Stages 2–4 across seeds 42–46,
-- uses a longer baseline with validation-loss early stopping and basic augmentation,
-- compares ensemble disagreement with max-probability and entropy baselines,
-- and adds bootstrap 95% confidence intervals.
-
-The corrected multi-seed workflow has not been executed in this environment because the RSNA DICOM data and original local model checkpoints are not present here. The numerical results currently shown above therefore remain the recorded notebook results, rather than newly rerun results.
-
-See `src/README.md` for commands and `data/README.md` for the expected external-data layout.
-
-# Reproducibility
-
-The notebooks contain the experimental code, validation checks, saved prediction workflows and notebook outputs used to produce the reported results.
-
-The five notebooks are organized in experimental order:
-
-1. Run Stage 1 to train the baseline and evaluate the controlled image shift.
-2. Run Stage 2 to generate external RSNA predictions.
-3. Run Stage 3 to fit and evaluate temperature scaling.
-4. Run Stage 4 to analyse confidence and errors.
-5. Run Stage 5 to train the ensemble and analyse model disagreement.
-
-The experiments used the RSNA data separately from the repository. The repository does not contain the medical datasets or model checkpoints.
-
----
-
-# Reproducibility note
-
-The notebooks contain executed outputs from the experimental runs, including image examples, reliability plots, metrics and Stage 5 analysis.
-
-A completely fresh end-to-end execution is not claimed here because the repository does not contain the RSNA DICOM dataset and the original local data paths are not part of the project. The README therefore reports the **recorded notebook results** rather than presenting an unverified rerun.
-
----
-
-# Status
-
-**Research preparation: Stages 1–5 completed and documented.**
-
-The next useful extensions would be:
-
-- additional calibration methods,
-- stronger uncertainty estimation,
-- multiple external datasets,
-- more realistic cross-site shifts,
-- structured clinical variables,
-- multimodal modelling,
-- and evaluation of whether uncertainty estimates remain useful under hospital-level distribution shift.
-
----
-
-## Research question revisited
-
-The project is not intended to establish a clinical pneumonia detector. It examines whether predictive performance, calibration, confidence and model disagreement remain informative when the evaluation data differ from the training distribution.
+Next scientific extensions include additional calibration methods, stronger uncertainty estimation, multiple external datasets, realistic cross-site shifts, structured clinical variables and multimodal modelling.

@@ -19,6 +19,13 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+Run the repository checks with:
+
+```bash
+pytest -q
+python -m compileall -q src
+```
+
 Start Jupyter with:
 
 ```bash
@@ -37,13 +44,9 @@ The repository does not store the dataset. The notebook downloads it through the
 
 The RSNA Pneumonia Detection Challenge data are not redistributed in this repository.
 
-The external evaluation requires:
+The external evaluation requires the separately obtained RSNA DICOM data and associated labels/annotations, with `pydicom` used for DICOM reading.
 
-- RSNA DICOM images
-- the corresponding annotation JSON
-- `pydicom` for DICOM reading
-
-The local experiment used the RSNA data separately from the repository.
+See `data/README.md` for the expected local layout.
 
 ## Research split rules
 
@@ -57,11 +60,16 @@ For Stage 1:
 
 For Stage 3, the Stage 2 RSNA predictions were divided into a calibration subset and a separate held-out evaluation subset. The temperature parameter was fitted on the calibration subset only and then evaluated on the held-out subset.
 
-## Reproducibility
+## Corrected reanalysis
 
-The repository now includes a `src/` package for the corrected reanalysis. The source workflow uses five seeds (42, 43, 44, 45, 46), validation-loss early stopping, basic training augmentation, identifier-based prediction/label alignment, uncertainty baselines, and bootstrap confidence intervals.
+The repository contains a small `src/` package for the next rigorous rerun:
 
-The RSNA data remain external and are not stored in the repository. See `data/README.md` and `src/README.md` for the expected local layout and commands.
+- `alignment.py` enforces `StudyInstanceUID` matching.
+- `metrics.py` centralises evaluation metrics and bootstrap confidence intervals.
+- `calibration.py` implements temperature scaling.
+- `stage5.py` compares ensemble disagreement with simple uncertainty baselines.
+
+The intended multi-seed study uses seeds 42, 43, 44, 45 and 46. The complete corrected rerun has **not** been claimed as executed because the RSNA data and original local checkpoints are not present in this environment.
 
 The executed notebooks remain preserved as the original experimental record.
 
@@ -71,4 +79,4 @@ The controlled contrast transformation is an artificial stress test. It is not e
 
 The RSNA experiment is an external-dataset evaluation. It should not be described as the planned cross-hospital MIMIC-CXR to CheXpert experiment.
 
-The project is a research preparation study, not a clinical validation system.
+The project is a research-preparation study, not a clinical validation system.

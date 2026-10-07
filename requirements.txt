@@ -2,6 +2,7 @@ numpy
 pandas
 matplotlib
 scikit-learn
+scipy
 pillow
 tqdm
 torch
@@ -9,3 +10,4 @@ torchvision
 medmnist
 pydicom
 jupyter
+pytest
